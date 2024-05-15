@@ -45,10 +45,22 @@ function M:buffers()
 end
 
 function M:should_hide(winnr)
+  local function should_disable_filetype(patterns, filetype)
+    local disabled = false
+
+    for pattern, _ in ipairs(patterns) do
+      if string.find(filetype, pattern) then
+        disabled = true
+        return
+      end
+    end
+    return disabled
+  end
+
   local bufnr = vim.api.nvim_win_get_buf(winnr)
   local filetype = vim.api.nvim_buf_get_option(bufnr, 'filetype')
   local buftype = vim.api.nvim_buf_get_option(bufnr, 'buftype')
-  local is_filetype_disabled = vim.tbl_contains(self.options.disabled_filetypes, filetype)
+  local is_filetype_disabled = should_disable_filetype(self.options.disabled_filetypes, filetype)
   local is_buftype_disabled = vim.tbl_contains(self.options.disabled_buftypes, buftype)
   local is_floating = '' ~= vim.api.nvim_win_get_config(winnr).relative
 
