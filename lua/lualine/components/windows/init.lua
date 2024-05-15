@@ -35,6 +35,7 @@ function M:buffers()
   local tabnr = vim.api.nvim_get_current_tabpage()
   local buffers = {}
 
+  vim.cmd('echom "about to call should_hide()"')
   for _, winnr in ipairs(vim.api.nvim_tabpage_list_wins(tabnr)) do
     if not self:should_hide(winnr) then
       buffers[#buffers + 1] = self:new_buffer(winnr)
@@ -47,7 +48,6 @@ end
 function M:should_hide(winnr)
   local function should_disable_filetype(patterns, filetype)
     local disabled = false
-
     for pattern, _ in ipairs(patterns) do
       if string.find(filetype, pattern) then
         disabled = true

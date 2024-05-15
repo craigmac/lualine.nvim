@@ -282,15 +282,23 @@ local function status_dispatch(sec_name)
         and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(refresh_real_curwin), 'filetype')
       or vim.bo.filetype
     local is_focused = focused ~= nil and focused or modules.utils.is_focused()
-    if
-      vim.tbl_contains(
-        config.options.disabled_filetypes[(sec_name == 'sections' and 'statusline' or sec_name)],
-        current_ft
-      )
-    then
-      -- disable on specific filetypes
-      return nil
+
+    for pattern, _ in pairs(config.options.disabled_filetypes) do
+      if string.find(current_ft, pattern) then
+        return nil
+      end
     end
+
+    -- if
+    --   vim.tbl_contains(
+    --     config.options.disabled_filetypes[(sec_name == 'sections' and 'statusline' or sec_name)],
+    --     current_ft
+    --   )
+    -- then
+    --   -- disable on specific filetypes
+    --   return nil
+    -- end
+
     local extension_sections = get_extension_sections(current_ft, is_focused, sec_name)
     if extension_sections ~= nil then
       retval = statusline(extension_sections, is_focused, sec_name == 'winbar')
